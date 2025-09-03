@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Box from "@mui/material/Box";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div style={{ width: "100%" }}>
+          <Box sx={{ display: "flex" }}>{children}</Box>
+        </div>
       </body>
     </html>
   );

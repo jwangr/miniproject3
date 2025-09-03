@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { marked } from "marked";
+import parse from "html-react-parser";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState("Why does durian stink?");
   const [result, setResult] = useState("");
 
   function formatResult(geminiRawResult) {
-    // Gemini may not return you the properly formatted text.
-    // TODO: You need to update the code of this function to tranform the geminiRawResult to a well formatted result. Hint: You may use some regular expressions for find/replace. 
-    const formattedResult = geminiRawResult;
+    const formattedResult = marked(geminiRawResult);
+
+    console.log(formattedResult);
     return formattedResult;
   }
 
@@ -21,23 +25,26 @@ export default function Home() {
     });
     const data = await res.json();
     const formattedResult = formatResult(data.content || data.error);
-    setResult(data.content || data.error);
+    setResult(formattedResult);
   }
 
   return (
     //TODO: Make your UI look better by adding additional elements and styles as you wish! Possibly add your styles to a new css file called chatbot.css, and import that file in this page
     <main style={{ padding: "2rem" }}>
       <h1>My Next.js Chatbot</h1>
-      <textarea
-        rows="5"
-        cols="50"
+      <TextField
+        label="Gemini Prompt"
+        multiline
+        rows={5}
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder="Type your prompt..."
       />
       <br />
-      <button onClick={sendPrompt}>Generate</button>
-      <pre>{result}</pre>
+      <Button variant="contained" onClick={sendPrompt}>
+        Generate
+      </Button>
+      <div>{parse(result)}</div>
     </main>
   );
 }
