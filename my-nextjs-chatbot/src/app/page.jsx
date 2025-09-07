@@ -4,11 +4,14 @@ import { useState } from "react";
 import { marked } from "marked";
 import parse from "html-react-parser";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import Loader from "./components/Loader";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("Why does durian stink?");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function formatResult(geminiRawResult) {
     const formattedResult = marked(geminiRawResult);
@@ -18,20 +21,27 @@ export default function Home() {
   }
 
   async function sendPrompt() {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await res.json();
-    const formattedResult = formatResult(data.content || data.error);
-    setResult(formattedResult);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await res.json();
+      const formattedResult = formatResult(data.content || data.error);
+      setResult(formattedResult);
+    } catch (error) {
+      setResult('Unable to chat to Gemini currently.')
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     //TODO: Make your UI look better by adding additional elements and styles as you wish! Possibly add your styles to a new css file called chatbot.css, and import that file in this page
-    <main style={{ padding: "2rem" }}>
-      <h1>My Next.js Chatbot</h1>
+    <Stack spacing={2}>
+      {loading && <Loader />}
       <TextField
         label="Gemini Prompt"
         multiline
@@ -45,6 +55,6 @@ export default function Home() {
         Generate
       </Button>
       <div>{parse(result)}</div>
-    </main>
+    </Stack>
   );
 }

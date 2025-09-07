@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
 import Box from "@mui/material/Box";
+import DrawerAppBar from "./components/NavBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +33,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div style={{ width: "100%" }}>
-          <Box sx={{ display: "flex" }}>{children}</Box>
-        </div>
+        <Box sx={{ display: "flex" }}>
+          <DrawerAppBar />
+          <div className="flex-auto justify-center p-5 mt-8">
+              {children}
+            
+          </div>
+        </Box>
       </body>
     </html>
   );
