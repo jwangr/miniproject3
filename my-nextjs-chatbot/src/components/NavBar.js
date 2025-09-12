@@ -8,18 +8,21 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { Card, CardContent } from '@mui/material';
+import { HistoryContext } from '@/contexts/HistoryContext';
+import parse from "html-react-parser";
 
 const drawerWidth = 400;
 const navItems = ['Recent'];
 
 function DrawerAppBar(props) {
+    const { chatHistory, addHistory } = useContext(HistoryContext);
+    console.log(chatHistory);
+
     const { window } = props;
     const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -27,23 +30,33 @@ function DrawerAppBar(props) {
         setMobileOpen((prevState) => !prevState);
     };
 
+    const historyList = (
+        [...chatHistory]?.reverse().map(element => (
+            <Card key={element[0].parts[0].text} className='m-2'>
+                <CardContent sx={{ height: '100%' }}>
+                    <Typography variant="h5" component="div">
+                        {element[0]?.parts[0].text || "No prompt"}
+                    </Typography>
+                    <Typography variant="body2" component="div" color='text.secondary'>
+                        {`${element[1]?.parts?.[0].text.slice(0, 50)} ${element[1]?.parts?.[0].text.length > 50 ? '...' : ''}` || "No description noted"}
+                    </Typography>
+                </CardContent>
+            </Card>
+        ))
+    )
+
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
             <Typography variant="h6" sx={{ my: 2 }}>
-                MUI
+                History
             </Typography>
             <Divider />
             <List>
-                {navItems.map((item) => (
-                    <ListItem key={item} disablePadding>
-                        <ListItemButton sx={{ textAlign: 'center' }}>
-                            <ListItemText primary={item} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
+                {historyList}
             </List>
         </Box>
     );
+
 
     const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -61,13 +74,14 @@ function DrawerAppBar(props) {
                     </Typography>
                     <Box>
                         <Button sx={{ color: '#fff' }} onClick={handleDrawerToggle}>
-                            Recent
+                            History
                         </Button>
                     </Box>
                 </Toolbar>
             </AppBar>
             <nav>
                 <Drawer
+                    anchor='right'
                     container={container}
                     variant="temporary"
                     open={mobileOpen}

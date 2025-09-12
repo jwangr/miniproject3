@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { marked } from "marked";
 import parse from "html-react-parser";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import Loader from "./components/Loader";
+import Loader from "../components/Loader";
+import { HistoryContext } from "@/contexts/HistoryContext";
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("Why does durian stink?");
+  const [prompt, setPrompt] = useState(
+    "Can Gemini take chat history for context?"
+  );
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { chatHistory, addHistory } = useContext(HistoryContext);
 
   function formatResult(geminiRawResult) {
     const formattedResult = marked(geminiRawResult);
@@ -29,10 +34,14 @@ export default function Home() {
         body: JSON.stringify({ prompt }),
       });
       const data = await res.json();
+
+      // Add to history context
+      addHistory(prompt, data);
+
       const formattedResult = formatResult(data.content || data.error);
       setResult(formattedResult);
     } catch (error) {
-      setResult('Unable to chat to Gemini currently.')
+      setResult("Unable to chat to Gemini currently.");
     } finally {
       setLoading(false);
     }
@@ -44,6 +53,7 @@ export default function Home() {
       {loading && <Loader />}
       <TextField
         label="Gemini Prompt"
+        color="success"
         multiline
         rows={5}
         value={prompt}
@@ -51,7 +61,7 @@ export default function Home() {
         placeholder="Type your prompt..."
       />
       <br />
-      <Button variant="contained" onClick={sendPrompt}>
+      <Button variant="contained" size="large" onClick={sendPrompt}>
         Generate
       </Button>
       <div>{parse(result)}</div>

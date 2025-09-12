@@ -2,7 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import Box from "@mui/material/Box";
-import DrawerAppBar from "./components/NavBar";
+import DrawerAppBar from "../components/NavBar";
+import { HistoryProvider } from "@/contexts/HistoryContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,15 +32,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Box sx={{ display: "flex" }}>
-          <DrawerAppBar />
-          <div className="flex-auto justify-center p-5 mt-8">
-              {children}
-            
-          </div>
-        </Box>
+        <HistoryProvider>
+          <Box sx={{ display: "flex" }}>
+            <DrawerAppBar />
+            <div className="flex-auto justify-center p-5 mt-8">{children}</div>
+          </Box>
+        </HistoryProvider>
       </body>
     </html>
   );
