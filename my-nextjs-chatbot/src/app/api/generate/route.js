@@ -8,8 +8,8 @@ const controller = new GeminiController();
 
 export async function POST(request) {
     try {
-        const body = await request.json();
-        const result = await controller.generateContent(body.prompt);
+        const { prompt, chatHistory } = await request.json();
+        const result = await controller.generateContent(prompt, chatHistory);
         return NextResponse.json({ content: result });
     } catch (error) {
         let statusCode;
